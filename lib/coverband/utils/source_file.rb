@@ -49,7 +49,7 @@ module Coverband
 
         # Returns true if this is a line that has been covered
         def covered?
-          !never? && !skipped? && coverage.positive?
+          !never? && !skipped? && coverage > 0
         end
 
         # Returns true if this line is not relevant for coverage
@@ -166,7 +166,7 @@ module Coverband
       end
 
       def formatted_covered_percent
-        covered_percent&.round(2)
+        covered_percent.round(2)
       end
 
       def covered_strength
@@ -193,11 +193,12 @@ module Coverband
       end
 
       def covered_lines_count
-        covered_lines&.count
+        covered_lines.count
       end
 
       def line_coverage(index)
-        lines[index]&.coverage
+        line = lines[index]
+        line.coverage unless line.nil?
       end
 
       # Returns all lines that should have been, but were not covered

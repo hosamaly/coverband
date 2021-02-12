@@ -13,7 +13,7 @@ module Coverband
         require "socket"
         require "securerandom"
         @coverband_url = coverband_url
-        @process_type = opts.fetch(:process_type) { $PROGRAM_NAME&.split("/")&.last || Coverband.configuration.process_type }
+        @process_type = opts.fetch(:process_type) { ($PROGRAM_NAME || '').split("/").last || Coverband.configuration.process_type }
         @hostname = opts.fetch(:hostname) { ENV["DYNO"] || Socket.gethostname.force_encoding("utf-8").encode }
         @hostname = @hostname.delete("'", "").delete("’", "")
         @runtime_env = opts.fetch(:runtime_env) { Coverband.configuration.coverband_env }
@@ -57,7 +57,8 @@ module Coverband
         end
         JSON.parse(res.body)
       rescue => e
-        logger&.error "Coverband: Error while retrieving coverage #{e}" if Coverband.configuration.verbose || Coverband.configuration.service_dev_mode
+        return if logger.nil?
+        logger.error "Coverband: Error while retrieving coverage #{e}" if Coverband.configuration.verbose || Coverband.configuration.service_dev_mode
       end
 
       def save_report(report)
@@ -68,7 +69,7 @@ module Coverband
 
         # TODO: do we need dup
         # TODO: we don't need upstream timestamps, server will track first_seen
-        Thread.new do
+        thread = Thread.new do
           data = expand_report(report.dup)
           full_package = {
             collection_type: "coverage_delta",
@@ -86,7 +87,7 @@ module Coverband
 
           save_coverage(full_package)
           retry_failed_reports
-        end&.join
+        end.join
       end
 
       def raw_store
@@ -112,7 +113,7 @@ module Coverband
 
       def add_retry_message(report_body)
         if @failed_coverage_reports.length > 5
-          logger&.info "Coverband: The errored reporting queue has reached 5. Subsequent reports will not be transmitted"
+          logger.info "Coverband: The errored reporting queue has reached 5. Subsequent reports will not be transmitted" unless logger.nil?
         else
           @failed_coverage_reports << report_body
         end
@@ -128,14 +129,15 @@ module Coverband
         send_report_body(coverage_body)
       rescue => e
         add_retry_message(coverage_body)
-        logger&.info "Coverband: Error while saving coverage #{e}" if Coverband.configuration.verbose || Coverband.configuration.service_dev_mode
+        return if logger.nil?
+        logger.info "Coverband: Error while saving coverage #{e}" if Coverband.configuration.verbose || Coverband.configuration.service_dev_mode
       end
 
       def send_report_body(coverage_body)
         uri = URI("#{coverband_url}/api/collector")
         req = ::Net::HTTP::Post.new(uri, "Content-Type" => "application/json", "Coverband-Token" => Coverband.configuration.api_key)
         req.body = coverage_body
-        logger&.info "Coverband: saving (#{uri}) #{req.body}" if Coverband.configuration.verbose
+        logger.info "Coverband: saving (#{uri}) #{req.body}" if Coverband.configuration.verbose && !logger.nil?
         res = ::Net::HTTP.start(
           uri.hostname,
           uri.port,

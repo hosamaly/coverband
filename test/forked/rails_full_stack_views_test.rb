@@ -22,7 +22,7 @@ class RailsFullStackTest < Minitest::Test
     visit "/dummy_view/show"
     assert_content("I am no dummy view tracker text")
     Coverband.report_coverage
-    Coverband.configuration.view_tracker&.report_views_tracked
+    Coverband.configuration.view_tracker.report_views_tracked
     visit "/coverage/view_tracker"
     assert_content("Used Views: (1)")
     assert_content("Unused Views: (2)")
@@ -33,7 +33,7 @@ class RailsFullStackTest < Minitest::Test
     visit "/dummy_view/show_haml"
     assert_content("I am haml text")
     Coverband.report_coverage
-    Coverband.configuration.view_tracker&.report_views_tracked
+    Coverband.configuration.view_tracker.report_views_tracked
     visit "/coverage/view_tracker"
     assert_content("Used Views: (2)")
     assert_content("Unused Views: (1)")
@@ -42,7 +42,7 @@ class RailsFullStackTest < Minitest::Test
     visit "/dummy_view/show_slim"
     assert_content("I am slim text")
     Coverband.report_coverage
-    Coverband.configuration.view_tracker&.report_views_tracked
+    Coverband.configuration.view_tracker.report_views_tracked
     visit "/coverage/view_tracker"
     assert_content("Used Views: (3)")
     assert_content("Unused Views: (0)")

@@ -17,7 +17,7 @@ module Coverband
     end
 
     def self.running?
-      @thread&.alive?
+      @thread.nil? ? false : @thread.alive?
     end
 
     def self.start
@@ -32,7 +32,8 @@ module Coverband
         @thread = Thread.new {
           loop do
             Coverband.report_coverage
-            Coverband.configuration.view_tracker&.report_views_tracked
+            view_tracker = Coverband.configuration.view_tracker
+            view_tracker.report_views_tracked unless view_tracker.nil?
             if Coverband.configuration.reporting_wiggle
               sleep_seconds = Coverband.configuration.background_reporting_sleep_seconds.to_i + rand(Coverband.configuration.reporting_wiggle.to_i)
             end

@@ -54,22 +54,24 @@ module Coverband
           @store.save_report(files_with_line_usage)
         end
       rescue => e
-        @logger&.error "coverage failed to store"
-        @logger&.error "Coverband Error: #{e.inspect} #{e.message}"
-        e.backtrace.each { |line| @logger&.error line } if @verbose
+        unless @logger.nil?
+          @logger.error "coverage failed to store"
+          @logger.error "Coverband Error: #{e.inspect} #{e.message}"
+          e.backtrace.each { |line| @logger.error line } if @verbose
+        end
         raise e if @test_env
       end
 
       private
 
       def filtered_files(new_results)
-        new_results.select! { |_file, coverage| coverage.any? { |value| value&.nonzero? } }
+        new_results.select! { |_file, coverage| coverage.compact.any?(&:nonzero?) }
         new_results
       end
 
       def initialize
         @semaphore = Mutex.new
-        raise NotImplementedError, "Coverage needs Ruby > 2.3.0" if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("2.3.0")
+        raise NotImplementedError, "Coverage needs Ruby > 2.2.0" if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("2.2.0")
 
         require "coverage"
         if RUBY_PLATFORM == "java"

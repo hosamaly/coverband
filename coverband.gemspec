@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rack-test"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "resque"
-  spec.add_development_dependency "standard", "= 0.2.5"
+# spec.add_development_dependency "standard", "= 0.2.5"
   spec.add_development_dependency "standardrb"
 
   spec.add_development_dependency "coveralls"
@@ -45,5 +45,5 @@ Gem::Specification.new do |spec|
   # redis now. I was reluctant to add this, but until we offer another production
   # quality adapter, I think this is more honest about requirements and reduces confusion
   # without this there was a race condition on calling coverband configure before redis was loaded
-  spec.add_runtime_dependency "redis"
+  spec.add_runtime_dependency "redis", '4.1.0'
 end

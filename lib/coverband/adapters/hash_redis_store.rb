@@ -169,7 +169,7 @@ module Coverband
       end
 
       def relative_paths(files)
-        files&.map! { |file| full_path_to_relative(file) }
+        (files || []).map! { |file| full_path_to_relative(file) }
       end
 
       def files_set(local_type = nil)

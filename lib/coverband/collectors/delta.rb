@@ -17,7 +17,8 @@ module Coverband
           if Coverband.configuration.use_oneshot_lines_coverage
             ::Coverage.result(clear: true, stop: false)
           else
-            ::Coverage.peek_result
+            return ::Coverage.peek_result if ::Coverage.respond_to?(:peek_result)
+            ::Coverage.result
           end
         end
       end

@@ -48,7 +48,10 @@
           <td><%= source_file.covered_lines.count + source_file.missed_lines.count %></td>
           <td><%= source_file.covered_lines.count %></td>
           <td>
-            <%= result.file_with_type(source_file, Coverband::RUNTIME_TYPE)&.covered_lines_count || 0 %>
+            <%=
+              file = result.file_with_type(source_file, Coverband::RUNTIME_TYPE)
+              file && file.covered_lines_count || 0
+            %>
           </td>
           <td><%= source_file.missed_lines.count %></td>
           <td><%= source_file.covered_strength %></td>

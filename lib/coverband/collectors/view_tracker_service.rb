@@ -20,7 +20,8 @@ module Coverband
         self.views_to_record = []
       rescue => e
         # we don't want to raise errors if Coverband can't reach the service
-        logger&.error "Coverband: view_tracker failed to store, error #{e.class.name}" if Coverband.configuration.verbose || Coverband.configuration.service_dev_mode
+        return if logger.nil?
+        logger.error "Coverband: view_tracker failed to store, error #{e.class.name}" if Coverband.configuration.verbose || Coverband.configuration.service_dev_mode
       end
 
       def self.supported_version?
@@ -52,7 +53,8 @@ module Coverband
           http.request(req)
         end
       rescue => e
-        logger&.error "Coverband: Error while saving coverage #{e}" if Coverband.configuration.verbose || Coverband.configuration.service_dev_mode
+        return if logger.nil?
+        logger.error "Coverband: Error while saving coverage #{e}" if Coverband.configuration.verbose || Coverband.configuration.service_dev_mode
       end
     end
   end

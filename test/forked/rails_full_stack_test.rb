@@ -91,7 +91,8 @@ class RailsFullStackTest < Minitest::Test
         }.pretty_print
         data = $stdout.string
         $stdout = previous_out
-        if data.match(/retained objects by gem(.*)retained objects by file/m)[0]&.match(/coverband/)
+        gems_retaining_objects = data.match(/retained objects by gem(.*)retained objects by file/m)
+        if gems_retaining_objects.length >= 1 && gems_retaining_objects[0].match(/coverband/)
           puts data
           raise "leaking memory!!!"
         end
